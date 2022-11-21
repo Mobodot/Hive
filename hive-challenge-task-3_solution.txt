@@ -105,3 +105,63 @@ Is it possible to add 100 nodes when we already have 100 nodes in Hive? If yes, 
 Ans: Yes it is. We do this by configuring the newly added hundred nodes with the
 cluster using the namenode and then setting up the hive program in each of the
 nodes.
+
+
+Hive Practical questions:
+
+Question 10: Hive Join operations
+
+Create a  table named CUSTOMERS(ID | NAME | AGE | ADDRESS   | SALARY)
+Create a Second  table ORDER(OID | DATE | CUSTOMER_ID | AMOUNT
+)
+
+Now perform different joins operations on top of these tables
+(Inner JOIN, LEFT OUTER JOIN ,RIGHT OUTER JOIN ,FULL OUTER JOIN)
+
+Ans:
+create database hive_class_b1;
+
+use hive_class_b1;
+
+create table customers
+(
+	id int,
+	name string,
+	age int,
+	address string,
+	salary int
+)
+row format delimited
+fields terminated by ',';
+
+
+create table order
+(
+	o_id int,
+	date datetime,
+	customer_id int,
+	amount int
+)
+row format delimited
+fields terminated by ',';
+
+# customer csv data
+210,John Doe,24,Delhi,1000
+220,Moon ethan,25,Rajasthan,2000
+230,Jessie,28,Bangalore,4000
+240,Benbrook,23,Bihar,3500
+250,Johnnie,26,Bangalore,1000
+
+# order data
+101,2016-03-01,240,750
+102,2016-05-02,210,720
+103,2017-06-25,200,450
+104,2016-03-02,240,100
+105,2018-07-03,230,230
+106,2018-07-18,250,300
+
+# loading data into customer table
+load data inpath 'file:///tmp/hive_practice/cust_data/' into table customers;
+
+# loading data into orders table
+load data inpath 'file:///tmp/hive_practice/orders_data/' into table customers;
