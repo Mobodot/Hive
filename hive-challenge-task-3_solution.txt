@@ -165,3 +165,29 @@ load data inpath 'file:///tmp/hive_practice/cust_data/' into table customers;
 
 # loading data into orders table
 load data inpath 'file:///tmp/hive_practice/orders_data/' into table customers;
+
+
+# performing joins
+# inner join
+select *
+	from customers as c
+	inner join order as o
+	on c.id = o.customer_id;
+	
+# left outer join
+select *
+	from customers as c
+	left outer join order as o
+	on c.id = o.customer_id;
+	
+# right outer join
+select *
+	from customers as c
+	right outer join order as o
+	on c.id = o.customer_id;
+	
+# full outer join
+select *
+	from customers as c
+	full outer join order as o
+	on c.id = o.customer_id;
