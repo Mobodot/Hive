@@ -88,3 +88,20 @@ these files are in the format: {id, name, e-mail, country}. Now, as we know, Had
 performance degrades when we use lots of small files.
 So, how will you solve this problem where we want to create a single Hive table for 
 lots of small files without degrading the performance of the system?
+
+
+Question 8:
+LOAD DATA LOCAL INPATH ‘Home/country/state/’
+OVERWRITE INTO TABLE address;
+
+The following statement failed to execute. What can be the cause?
+
+Ans: Incorrect syntax, we can't overwrite the data in a table using the load command.
+
+
+Question 9:
+Is it possible to add 100 nodes when we already have 100 nodes in Hive? If yes, how?
+
+Ans: Yes it is. We do this by configuring the newly added hundred nodes with the
+cluster using the namenode and then setting up the hive program in each of the
+nodes.
