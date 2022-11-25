@@ -1,0 +1,135 @@
+create database main_work;
+use main_work;
+
+create table if not exists sales_order_table(
+	ORDERNUMBER int,
+	QUANTITYORDERED int,
+	PRICEEACH float,
+	ORDERLINENUMBER int,
+	SALES float,
+	STATUS_ varchar(20),
+	QTR_ID int,
+	MONTH_ID int,
+	YEAR_ID int,
+	PRODUCTLINE varchar(50),
+	MSRP int,
+	PRODUCTCODE varchar(20),
+	PHONE varchar(20),
+	CITY varchar(20),
+	STATE varchar(20),
+	POSTALCODE varchar(10),
+	COUNTRY varchar(20),
+	TERRITORY varchar(10),
+	CONTACTLASTNAME varchar(20),
+	CONTACTFIRSTNAME varchar(20),
+	DEALSIZE varchar(10)
+);
+
+LOAD DATA INFILE "/var/lib/mysql-files/sales_order_data.csv"
+	INTO TABLE sales_order_table
+    FIELDS TERMINATED BY ','
+    LINES TERMINATED BY '\n'
+    IGNORE 1 ROWS;
+    
+    
+select * from sales_order_table;
+
+-- Question 1: Calculatye total sales per year
+select year_id,
+		sum(sales) as total_sales
+	from sales_order_table
+    group by year_id;
+    
+-- Question 2: Find a product for which maximum orders were placed
+select productcode,
+		sum(quantityordered) as quantityordered
+	from sales_order_table
+    group by productcode
+    order by 2 desc
+    limit 1;
+    
+    
+-- Question 3: Calculate the total sales for each quarter
+select year_id,
+		case
+			when month_id between 1 and 3 then "first_quarter"
+            when month_id between 4 and 6 then "second_quarter"
+            when month_id between 7 and 9 then "third_quarter"
+            when month_id between 10 and 12 then "fourth_quarter"
+            else null
+        end as time_of_year,
+        sum(sales) as total_sales
+	from sales_order_table
+    group by 1, 2
+    order by 1;
+    
+-- Question 4: In which quarter sales was minimum
+with quarterly_sales as (
+						select year_id,
+							case
+								when month_id between 1 and 3 then "first_quarter"
+								when month_id between 4 and 6 then "second_quarter"
+								when month_id between 7 and 9 then "third_quarter"
+								when month_id between 10 and 12 then "fourth_quarter"
+								else null
+							end as time_of_year,
+							sum(sales) as total_sales
+						from sales_order_table
+						group by 1, 2
+						) 
+select qs.year_id,
+		qs.time_of_year,
+        qs.total_sales as min_sales
+	from quarterly_sales as qs
+    where total_sales = (
+						select min(total_sales) as min_sales
+							from quarterly_sales
+							);
+
+-- Question 5: In which country sales was maximum and in which country sales was minimum
+-- Maximum sales
+select country,
+		sum(sales) as min_sales
+	from sales_order_table
+    group by 1
+    order by 2 desc
+    limit 1;
+    
+
+-- Minimum sales
+select country,
+		sum(sales) as min_sales
+	from sales_order_table
+    group by 1
+    order by 2 
+    limit 1;
+    
+-- Question 6: Calculate the quarterly sales for each city
+select year_id,
+		city,
+		case
+			when month_id between 1 and 3 then "first_quarter"
+            when month_id between 4 and 6 then "second_quarter"
+            when month_id between 7 and 9 then "third_quarter"
+            when month_id between 10 and 12 then "fourth_quarter"
+            else null
+        end as time_of_year,
+        sum(sales) as total_sales
+	from sales_order_table
+    group by 1, 2,3
+    order by 1;
+    
+-- Question 7: Find a month for each year in which maximum number of quantities were sold
+with month_quantity_ranking as (select year_id,
+										month_id,
+										quantityordered,
+										row_number() over (partition by year_id 
+															order by quantityordered desc) as order_rank
+									from sales_order_table
+								)
+                                
+select mqr.year_id,
+		mqr.month_id,
+        mqr.quantityordered
+	from month_quantity_ranking as mqr
+    where mqr.order_rank = 1;
